@@ -1,0 +1,99 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: MyStay Hcontrol API
+  description: API used for integration of MyStay with Hcontrol PMS
+  contact:
+    name: Denis Fiser
+    email: denis.fiser@mystay.cz
+    url: http://mystay.cz
+host: api.hcontrol.nl
+basePath: /
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /reservations:
+    post:
+      description:
+        Get all active reservations
+      operationId: getReservations
+      parameters:
+        - name: hotel
+          in: formData
+          description: Hotel code (e.g. hilton, ...)
+          required: true
+          type: string
+        - name: key
+          in: formData
+          description: Hcontrol API key
+          required: true
+          type: string
+      responses:
+        200:
+          description: reservations
+          schema:
+            $ref: '#/definitions/Reservations'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Reservations:
+    type: "object"
+    required:
+      - reservations
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      reservations:
+        type: array
+        items:
+          $ref: '#/definitions/Reservation'
+  Reservation:
+    required:
+      - username
+      - calendarName
+      - accessKey
+      - mobileNumber
+      - startDate
+      - endDate
+    properties:
+      username:
+        type: string
+        description: Username/hotel code (hilton, clemens, etc.)
+      calendarName:
+        type: string
+        description: Room number
+      accessKey:
+        type: string
+        description: Access key to enter the room
+      mobileNumber:
+        type: string
+        description: Client mobile number
+      startDate:
+        type: integer
+        format: int64
+        description: booking start unix timestamp e.g. 1465552198
+      endDate:
+        type: integer
+        format: int64
+        description: booking end unix timestamp e.g. 1465552199
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
