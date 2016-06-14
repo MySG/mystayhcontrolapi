@@ -1,14 +1,14 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  version: 1.0.0
+  version: 1.0.1
   title: MyStay Hcontrol API
   description: API used for integration of MyStay with Hcontrol PMS
   contact:
     name: Denis Fiser
     email: denis.fiser@mystay.cz
-    url: http://mystay.cz
-host: api.hcontrol.nl
-basePath: /
+    url: 'http://mystay.cz'
+host: hcontrol.nl
+basePath: /api
 schemes:
   - https
 consumes:
@@ -18,13 +18,12 @@ produces:
 paths:
   /reservations:
     post:
-      description:
-        Get all active reservations
+      description: Get all active reservations
       operationId: getReservations
       parameters:
         - name: hotel
           in: formData
-          description: Hotel code (e.g. hilton, ...)
+          description: 'Username/hotel code (hilton, clemens, etc.)'
           required: true
           type: string
         - name: key
@@ -33,27 +32,35 @@ paths:
           required: true
           type: string
       responses:
-        200:
+        '200':
           description: reservations
           schema:
             $ref: '#/definitions/Reservations'
-        default:
+        '400':
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
 definitions:
   Reservations:
-    type: "object"
+    type: object
     required:
       - reservations
       - code
-      - message
     properties:
       code:
         type: integer
         format: int32
+        enum:
+          - 1
+          - 101
+          - 102
+        default: 1
+        description: >
+          Status codes: - 1: OK - 101: Username not found - 102: Unauthorized
+          access, check your api key
       message:
         type: string
+        default: OK
       reservations:
         type: array
         items:
@@ -69,7 +76,7 @@ definitions:
     properties:
       username:
         type: string
-        description: Username/hotel code (hilton, clemens, etc.)
+        description: 'Username/hotel code (example: hilton, clemens, etc.)'
       calendarName:
         type: string
         description: Room number
@@ -80,13 +87,13 @@ definitions:
         type: string
         description: Client mobile number
       startDate:
-        type: integer
-        format: int64
-        description: booking start unix timestamp e.g. 1465552198
+        type: string
+        format: date
+        description: booking start date e.g. 2016-07-12
       endDate:
-        type: integer
-        format: int64
-        description: booking end unix timestamp e.g. 1465552199
+        type: string
+        format: date
+        description: booking end date e.g. 2016-07-18
   Error:
     required:
       - code
@@ -95,5 +102,9 @@ definitions:
       code:
         type: integer
         format: int32
+        enum:
+          - 1
+          - 101
+          - 102
       message:
         type: string
